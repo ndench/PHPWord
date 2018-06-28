@@ -435,11 +435,20 @@ abstract class AbstractElement
      */
     protected function setNewStyle($styleObject, $styleValue = null, $returnObject = false)
     {
-        if (!is_null($styleValue) && is_array($styleValue)) {
+        if (is_array($styleValue)) {
             $styleObject->setStyleByArray($styleValue);
             $style = $styleObject;
+        } elseif ($returnObject) {
+            // This is here for BC reasons.
+            // $returnObject should be removed and $styleObject returned if $styleValue is not an array or valid object.
+            $style = $styleObject;
+        } elseif (is_object($styleObject) && $styleValue instanceof $styleObject) {
+            $style = $styleValue;
         } else {
-            $style = $returnObject ? $styleObject : $styleValue;
+            // This is here for BC reasons.
+            // $styleObject should be returned, but if this function is called with the current default values, then
+            // $style will be set null.
+            $style = null;
         }
 
         return $style;
