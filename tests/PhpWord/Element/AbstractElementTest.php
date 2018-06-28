@@ -49,8 +49,7 @@ class AbstractElementTest extends \PHPUnit\Framework\TestCase
 
         $styleObject = $this->createMock('\PhpOffice\PhpWord\Style\AbstractStyle');
         $styleObject->expects(static::never())
-            ->method('setStyleByArray')
-        ;
+            ->method('setStyleByArray');
 
         $style = $stub->callSetNewStyle($styleObject, null, true);
 
@@ -63,8 +62,8 @@ class AbstractElementTest extends \PHPUnit\Framework\TestCase
 
         $styleObject = $this->createMock('\PhpOffice\PhpWord\Style\AbstractStyle');
         $styleObject->expects(static::never())
-            ->method('setStyleByArray')
-        ;
+            ->method('setStyleByArray');
+
         $styleValue = $this->createMock('\PhpOffice\PhpWord\Style\AbstractStyle');
 
         $style = $stub->callSetNewStyle($styleObject, $styleValue, false);
@@ -76,15 +75,14 @@ class AbstractElementTest extends \PHPUnit\Framework\TestCase
     {
         $stub = $this->getElementStub();
 
-        $styleValue = [
+        $styleValue = array(
             'coolStyle' => true,
-        ];
+        );
 
         $styleObject = $this->createMock('\PhpOffice\PhpWord\Style\AbstractStyle');
         $styleObject->expects(static::once())
             ->method('setStyleByArray')
-            ->with($styleValue)
-        ;
+            ->with($styleValue);
 
         $style = $stub->callSetNewStyle($styleObject, $styleValue);
 
@@ -104,8 +102,7 @@ class AbstractElementTest extends \PHPUnit\Framework\TestCase
 
     private function getElementStub()
     {
-        return new class extends AbstractElement
-        {
+        return new class() extends AbstractElement {
             public function callSetNewStyle($styleObject, $styleValue = null, $returnObject = false)
             {
                 return $this->setNewStyle($styleObject, $styleValue, $returnObject);
