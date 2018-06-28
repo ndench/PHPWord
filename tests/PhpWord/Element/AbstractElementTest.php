@@ -45,36 +45,30 @@ class AbstractElementTest extends \PHPUnit\Framework\TestCase
 
     public function testSetNewStyleReturnsStyleObjectIfReturnObjectIsTrue()
     {
-        $stub = $this->getElementStub();
-
         $styleObject = $this->createMock('\PhpOffice\PhpWord\Style\AbstractStyle');
         $styleObject->expects(static::never())
             ->method('setStyleByArray');
 
-        $style = $stub->callSetNewStyle($styleObject, null, true);
+        $style = $this->invokeSetNewStyle($styleObject, null, true);
 
         static::assertSame($styleObject, $style);
     }
 
     public function testSetNewStyleReturnsStyleValueIfReturnObjectIsFalse()
     {
-        $stub = $this->getElementStub();
-
         $styleObject = $this->createMock('\PhpOffice\PhpWord\Style\AbstractStyle');
         $styleObject->expects(static::never())
             ->method('setStyleByArray');
 
         $styleValue = $this->createMock('\PhpOffice\PhpWord\Style\AbstractStyle');
 
-        $style = $stub->callSetNewStyle($styleObject, $styleValue, false);
+        $style = $this->invokeSetNewStyle($styleObject, $styleValue, false);
 
         static::assertSame($styleValue, $style);
     }
 
     public function testSetNewStyleCallsSetStyleByArrayIfArrayGiven()
     {
-        $stub = $this->getElementStub();
-
         $styleValue = array(
             'coolStyle' => true,
         );
@@ -84,29 +78,28 @@ class AbstractElementTest extends \PHPUnit\Framework\TestCase
             ->method('setStyleByArray')
             ->with($styleValue);
 
-        $style = $stub->callSetNewStyle($styleObject, $styleValue);
+        $style = $this->invokeSetNewStyle($styleObject, $styleValue);
 
         static::assertSame($styleObject, $style);
     }
 
     public function testSetNewStyleReturnsNullWhenDefaultParamsGiven()
     {
-        $stub = $this->getElementStub();
-
         $styleObject = $this->createMock('\PhpOffice\PhpWord\Style\AbstractStyle');
 
-        $style = $stub->callSetNewStyle($styleObject);
+        $style = $this->invokeSetNewStyle($styleObject);
 
         static::assertNull($style);
     }
 
-    private function getElementStub()
+    private function invokeSetNewStyle($styleObject, $styleValue = null, $returnObject = false)
     {
-        return new class() extends AbstractElement {
-            public function callSetNewStyle($styleObject, $styleValue = null, $returnObject = false)
-            {
-                return $this->setNewStyle($styleObject, $styleValue, $returnObject);
-            }
-        };
+        $stub = $this->getMockForAbstractClass('\PhpOffice\PhpWord\Element\AbstractElement');
+
+        $reflection = new \ReflectionClass($stub);
+        $method = $reflection->getMethod('setNewStyle');
+        $method->setAccessible(true);
+
+        return $method->invoke($stub, $styleObject, $styleValue, $returnObject);
     }
 }
