@@ -42,4 +42,74 @@ class AbstractElementTest extends \PHPUnit\Framework\TestCase
         $stub->setElementId();
         $this->assertEquals(6, strlen($stub->getElementId()));
     }
+
+    public function testSetNewStyleReturnsStyleObjectIfReturnObjectIsTrue()
+    {
+        $stub = $this->getElementStub();
+
+        $styleObject = $this->createMock('\PhpOffice\PhpWord\Style\AbstractStyle');
+        $styleObject->expects(static::never())
+            ->method('setStyleByArray')
+        ;
+
+        $style = $stub->callSetNewStyle($styleObject, null, true);
+
+        static::assertSame($styleObject, $style);
+    }
+
+    public function testSetNewStyleReturnsStyleValueIfReturnObjectIsFalse()
+    {
+        $stub = $this->getElementStub();
+
+        $styleObject = $this->createMock('\PhpOffice\PhpWord\Style\AbstractStyle');
+        $styleObject->expects(static::never())
+            ->method('setStyleByArray')
+        ;
+        $styleValue = $this->createMock('\PhpOffice\PhpWord\Style\AbstractStyle');
+
+        $style = $stub->callSetNewStyle($styleObject, $styleValue, false);
+
+        static::assertSame($styleValue, $style);
+    }
+
+    public function testSetNewStyleCallsSetStyleByArrayIfArrayGiven()
+    {
+        $stub = $this->getElementStub();
+
+        $styleValue = [
+            'coolStyle' => true,
+        ];
+
+        $styleObject = $this->createMock('\PhpOffice\PhpWord\Style\AbstractStyle');
+        $styleObject->expects(static::once())
+            ->method('setStyleByArray')
+            ->with($styleValue)
+        ;
+
+        $style = $stub->callSetNewStyle($styleObject, $styleValue);
+
+        static::assertSame($styleObject, $style);
+    }
+
+    public function testSetNewStyleReturnsNullWhenDefaultParamsGiven()
+    {
+        $stub = $this->getElementStub();
+
+        $styleObject = $this->createMock('\PhpOffice\PhpWord\Style\AbstractStyle');
+
+        $style = $stub->callSetNewStyle($styleObject);
+
+        static::assertNull($style);
+    }
+
+    private function getElementStub()
+    {
+        return new class extends AbstractElement
+        {
+            public function callSetNewStyle($styleObject, $styleValue = null, $returnObject = false)
+            {
+                return $this->setNewStyle($styleObject, $styleValue, $returnObject);
+            }
+        };
+    }
 }
